@@ -1,0 +1,27 @@
+name: classic
+description: A classic Go project structure
+variables:
+    - PROJECT_NAME
+directories:
+    - path: bin
+    - path: bin/${PROJECT_NAME}
+    - path: configs
+    - path: configs/develop
+    - path: configs/production
+    - path: configs/local
+    - path: data
+    - path: docs
+    - path: service
+    - path: service/deployments
+    - path: service/deployments/${PROJECT_NAME}
+    - path: service/deployments/${PROJECT_NAME}/linux
+    - path: src
+    - path: src/cmd
+    - path: src/cmd/${PROJECT_NAME}
+    - path: src/internal
+    - path: src/internal/app
+    - path: src/internal/app/${PROJECT_NAME}
+    - path: src/internal/app/${PROJECT_NAME}/cli
+    - path: src/internal/app/${PROJECT_NAME}/config
+    - path: src/internal/app/${PROJECT_NAME}/domain
+    - path: src/internal/pkg
