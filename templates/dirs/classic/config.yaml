@@ -18,6 +18,11 @@ directories:
     - path: src
     - path: src/cmd
     - path: src/cmd/${PROJECT_NAME}
+    - path: src/cmd/${PROJECT_NAME}/di
+    - path: src/cmd/${PROJECT_NAME}/di/providers
+    - path: src/cmd/${PROJECT_NAME}/di/providers/configs
+    - path: src/cmd/${PROJECT_NAME}/di/providers/domain
+    - path: src/cmd/${PROJECT_NAME}/di/providers/infrastructure
     - path: src/internal
     - path: src/internal/app
     - path: src/internal/app/${PROJECT_NAME}

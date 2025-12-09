@@ -1,0 +1,48 @@
+name: DDD
+description: A DDD Hexagonal Clean Architecture Go project structure
+variables:
+    - PROJECT_NAME
+directories:
+    - path: bin
+    - path: bin/${PROJECT_NAME}
+    - path: configs
+    - path: configs/develop
+    - path: configs/production
+    - path: configs/local
+    - path: data
+    - path: docs
+    - path: service
+    - path: service/deployments
+    - path: service/deployments/${PROJECT_NAME}
+    - path: service/deployments/${PROJECT_NAME}/linux
+    - path: src
+    - path: src/cmd
+    - path: src/cmd/${PROJECT_NAME}
+    - path: src/cmd/${PROJECT_NAME}/di
+    - path: src/cmd/${PROJECT_NAME}/di/providers
+    - path: src/cmd/${PROJECT_NAME}/di/providers/configs
+    - path: src/cmd/${PROJECT_NAME}/di/providers/domain
+    - path: src/cmd/${PROJECT_NAME}/di/providers/infrastructure
+    - path: src/internal
+    - path: src/internal/app
+    - path: src/internal/app/${PROJECT_NAME}
+    - path: src/internal/app/${PROJECT_NAME}/cli
+    - path: src/internal/app/${PROJECT_NAME}/config
+    - path: src/internal/app/${PROJECT_NAME}/generated
+    - path: src/internal/app/${PROJECT_NAME}/layers
+    - path: src/internal/app/${PROJECT_NAME}/layers/adapters
+    - path: src/internal/app/${PROJECT_NAME}/layers/adapters/in
+    - path: src/internal/app/${PROJECT_NAME}/layers/adapters/out
+    - path: src/internal/app/${PROJECT_NAME}/layers/core
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/application
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/application/event-handlers
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/application/usecases
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/application/usecases/commands
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/application/usecases/queries
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/domain
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/domain/value-objects
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/domain/entities
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/domain/aggregates
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/domain/services
+    - path: src/internal/app/${PROJECT_NAME}/layers/core/ports
+    - path: src/internal/pkg
