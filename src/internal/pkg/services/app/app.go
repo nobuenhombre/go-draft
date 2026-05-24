@@ -1,0 +1,182 @@
+package app
+
+import (
+	"bytes"
+	"errors"
+	"go/format"
+	"os"
+	"path/filepath"
+	"strings"
+	"text/template"
+
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/locator"
+	"github.com/nobuenhombre/suikat/pkg/ge"
+)
+
+var (
+	// ErrorModulePathNotFound is returned when go.mod has no module directive.
+	ErrorModulePathNotFound = errors.New("module path not found in go.mod")
+)
+
+// Service defines the interface for creating app scaffolding.
+type Service interface {
+	// CreateApp generates Go source files for a new application from templates.
+	// appType is "cli" or "service".
+	CreateApp(appName string, appType string) error
+}
+
+// Provider implements the Service interface.
+type Provider struct{}
+
+// TemplateData holds variables for template execution.
+type TemplateData struct {
+	// AppName is the name of the application (e.g., "fastmail-gpt-reply").
+	AppName string
+	// ModulePath is the Go module path from go.mod (e.g., "github.com/org/repo").
+	ModulePath string
+}
+
+// New creates a new Provider instance.
+func New() Service {
+	return &Provider{}
+}
+
+// CreateApp generates Go source files for a new application from templates.
+func (p *Provider) CreateApp(appName string, appType string) error {
+	workDir, err := os.Getwd()
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	projectRoot, err := findProjectRoot(workDir)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	modulePath, err := readModulePath(projectRoot)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	templateDir, err := locator.FindTemplateDir("app/" + appType)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	data := TemplateData{
+		AppName:    appName,
+		ModulePath: modulePath,
+	}
+
+	err = filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if !strings.HasSuffix(path, ".tpl") {
+			return nil
+		}
+
+		return p.processTemplate(path, templateDir, projectRoot, data)
+	})
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	return nil
+}
+
+// processTemplate reads a single .tpl file, executes it with data, and writes the result.
+func (p *Provider) processTemplate(tplPath, templateDir, projectRoot string, data TemplateData) error {
+	content, err := os.ReadFile(tplPath)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	tmpl, err := template.New(filepath.Base(tplPath)).Parse(string(content))
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, data)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	// Compute output path: relative to templateDir, strip .tpl suffix
+	relPath, err := filepath.Rel(templateDir, tplPath)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	outputRelPath := strings.TrimSuffix(relPath, ".tpl")
+	outputRelPath = strings.ReplaceAll(outputRelPath, "{{.AppName}}", data.AppName)
+
+	// _root_ prefix → output at project root, otherwise under src/
+	var outputPath string
+	if strings.HasPrefix(outputRelPath, "_root_/") {
+		outputPath = filepath.Join(projectRoot, strings.TrimPrefix(outputRelPath, "_root_/"))
+	} else {
+		outputPath = filepath.Join(projectRoot, "src", outputRelPath)
+	}
+
+	err = os.MkdirAll(filepath.Dir(outputPath), 0755)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	source := buf.Bytes()
+	if strings.HasSuffix(outputPath, ".go") {
+		formatted, err := format.Source(source)
+		if err != nil {
+			return ge.Pin(err)
+		}
+		source = formatted
+	}
+
+	err = os.WriteFile(outputPath, source, 0644)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	return nil
+}
+
+// findProjectRoot walks up from workDir to find the directory containing go.mod.
+func findProjectRoot(workDir string) (string, error) {
+	dir := workDir
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", ge.Pin(errors.New("project root (go.mod) not found"))
+		}
+		dir = parent
+	}
+}
+
+// readModulePath extracts the module path from go.mod.
+func readModulePath(projectRoot string) (string, error) {
+	goModPath := filepath.Join(projectRoot, "go.mod")
+	content, err := os.ReadFile(goModPath)
+	if err != nil {
+		return "", ge.Pin(err)
+	}
+
+	for _, line := range strings.Split(string(content), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "module ") {
+			modulePath := strings.TrimSpace(strings.TrimPrefix(line, "module"))
+			if modulePath != "" {
+				return modulePath, nil
+			}
+		}
+	}
+
+	return "", ge.Pin(ErrorModulePathNotFound)
+}

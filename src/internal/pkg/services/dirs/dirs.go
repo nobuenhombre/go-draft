@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	configdirs "github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs/config"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/locator"
 	"github.com/nobuenhombre/suikat/pkg/ge"
 )
 
 var (
-	ErrorCouldNotFindTemplatesDirs = errors.New("could not find templates dirs")
-	ErrorMissingTemplateVar        = errors.New("template variable is missing")
+	ErrorMissingTemplateVar = errors.New("template variable is missing")
 )
 
 type Service interface {
@@ -28,7 +28,7 @@ func New() Service {
 }
 
 func (p *Provider) CreateDirs(name string, vars map[string]string) error {
-	path, err := p.getPath(name)
+	path, err := locator.FindTemplateDir("dirs/" + name)
 	if err != nil {
 		return ge.Pin(err)
 	}
@@ -86,27 +86,4 @@ func (p *Provider) CreateDirs(name string, vars map[string]string) error {
 	}
 
 	return nil
-}
-
-func (p *Provider) searchPaths(name string) []string {
-	return []string{
-		"/usr/local/share/go-draft/templates/dirs/" + name,
-		"/usr/share/go-draft/templates/dirs/" + name,
-		"/opt/go-draft/templates/dirs/" + name,
-		filepath.Join(os.Getenv("HOME"), ".go-draft/templates/dirs/"+name),
-		"templates/dirs/" + name,
-	}
-}
-
-func (p *Provider) getPath(name string) (string, error) {
-	listPaths := p.searchPaths(name)
-
-	for _, path := range listPaths {
-		_, err := os.Stat(path)
-		if err == nil {
-			return path, nil
-		}
-	}
-
-	return "", ge.Pin(ErrorCouldNotFindTemplatesDirs, ge.Params{"search paths": listPaths})
 }
