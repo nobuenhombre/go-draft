@@ -10,13 +10,14 @@
 internal/
 ├── app/go-draft/        # Слой приложения (см. app/go-draft/AGENTS.md)
 │   ├── cli/             # Парсинг CLI-флагов
-│   ├── domain/          # Бизнес-логика (оркестратор MakeDirs)
-│   ├── config/          # Пусто — reserved
-│   └── version/         # Версионирование
+│   ├── domain/          # Бизнес-логика (оркестратор MakeDirs, MakeApp)
+│   ├── version/         # Версионирование
+│   └── config/          # Пусто — reserved
 │
 └── pkg/services/        # Переиспользуемые сервисы (см. pkg/services/AGENTS.md)
     ├── dirs/            # Создание директорий по YAML-шаблону
-    └── vars/            # Парсинг переменных key:value
+    ├── vars/            # Парсинг переменных key:value
+    └── app/             # Генерация Go-каркасов из шаблонов
 ```
 
 ## Сводка
@@ -24,19 +25,20 @@ internal/
 | Слой | Пакеты | Go-файлы | Назначение |
 |------|--------|----------|------------|
 | `app/` | 4 | 6 | CLI, domain, version |
-| `pkg/services/` | 2 (+ config) | 7 | Dirs, Vars сервисы |
-| **Итого** | **6+** | **13** | |
+| `pkg/services/` | 3 (+ config) | 10 | Dirs, Vars, App сервисы |
+| **Итого** | **7+** | **16** | |
 
 ## Архитектура слоёв
 
 ```
 cmd/go-draft/main.go → initializeApp()
   │
-  ├── app/go-draft/cli      → CLI-флаги (-make, -dirs, -vars)
-  ├── pkg/services/dirs     → Создание директорий по YAML-шаблону
-  ├── pkg/services/vars     → Парсинг переменных
+  ├── app/go-draft/cli         → CLI-флаги (-make, -dirs, -appname, -vars)
+  ├── pkg/services/dirs        → Создание директорий по YAML-шаблону
+  ├── pkg/services/vars        → Парсинг переменных key:value
+  ├── pkg/services/app         → Генерация Go-файлов из text/template
   │
-  └── app/go-draft/domain   → Оркестратор (cli → vars → dirs)
+  └── app/go-draft/domain      → Оркестратор (MakeDirs / MakeApp)
 ```
 
 ## Правила

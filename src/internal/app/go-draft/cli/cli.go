@@ -11,9 +11,11 @@ type Service interface {
 // Config represents the command-line interface configuration structure.
 // It holds configuration parameters for the CLI application.
 type Config struct {
-	Make string `cli:"make[Command to execute]:string=dirs"`
+	Make string `cli:"make[Command to execute (dirs/cli/service)]:string=dirs"`
 	// Dirs specifies the directory structure template for configuration files.
 	Dirs string `cli:"dirs[Directory structure template]:string=classic"`
+	// AppName specifies the application name used with -make=app.
+	AppName string `cli:"appname[Application name for app scaffolding]:string="`
 	// Vars contains variables for substitution in the format key1:value1,key2:value2.
 	Vars    string `cli:"vars[Variables for substitution in the format key1:value1,key2:value2]:string="`
 	Version bool   `cli:"version[Show version and exit]:bool=false"`

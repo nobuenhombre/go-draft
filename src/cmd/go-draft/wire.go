@@ -7,6 +7,7 @@ import (
 	"github.com/google/wire"
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/cli"
 	domainapp "github.com/nobuenhombre/go-draft/src/internal/app/go-draft/domain"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/app"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/vars"
 )
@@ -18,6 +19,7 @@ func initializeApp() (IApp, func(), error) {
 		cli.ProviderSet,
 		dirs.ProviderSet,
 		vars.ProviderSet,
+		app.ProviderSet,
 		domainapp.ProviderSet,
 		newApp,
 	)

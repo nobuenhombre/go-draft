@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/cli"
+	appsvc "github.com/nobuenhombre/go-draft/src/internal/pkg/services/app"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/vars"
 	"github.com/nobuenhombre/suikat/pkg/ge"
@@ -14,10 +15,13 @@ var (
 	ErrorEmptyMakeCommand      = errors.New("empty make command")
 	ErrorUnknownMakeCommand    = errors.New("unknown make command")
 	ErrorEmptyDirsTemplateName = errors.New("empty dirs template name")
+	ErrorEmptyAppName          = errors.New("empty app name")
 )
 
 const (
-	MakeDirs = "dirs"
+	MakeDirs    = "dirs"
+	MakeCli     = "cli"
+	MakeService = "service"
 )
 
 type DomainService interface {
@@ -28,13 +32,15 @@ type AppDomain struct {
 	Cli  *cli.Config
 	Dirs dirs.Service
 	Vars vars.Service
+	App  appsvc.Service
 }
 
-func New(cliConfig cli.Service, dirsService dirs.Service, varsService vars.Service) DomainService {
+func New(cliConfig cli.Service, dirsService dirs.Service, varsService vars.Service, appService appsvc.Service) DomainService {
 	return &AppDomain{
 		Cli:  cliConfig.(*cli.Config),
 		Dirs: dirsService,
 		Vars: varsService,
+		App:  appService,
 	}
 }
 
@@ -47,6 +53,11 @@ func (d *AppDomain) Run() error {
 	switch makeCmd {
 	case MakeDirs:
 		err := d.MakeDirs()
+		if err != nil {
+			return ge.Pin(err)
+		}
+	case MakeCli, MakeService:
+		err := d.MakeApp(makeCmd)
 		if err != nil {
 			return ge.Pin(err)
 		}
@@ -68,7 +79,21 @@ func (d *AppDomain) MakeDirs() error {
 		return ge.Pin(err)
 	}
 
-	err = d.Dirs.CreateDirs(d.Cli.Dirs, vars)
+	err = d.Dirs.CreateDirs(name, vars)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	return nil
+}
+
+func (d *AppDomain) MakeApp(appType string) error {
+	appName := strings.TrimSpace(d.Cli.AppName)
+	if len(appName) == 0 {
+		return ge.Pin(ErrorEmptyAppName)
+	}
+
+	err := d.App.CreateApp(appName, appType)
 	if err != nil {
 		return ge.Pin(err)
 	}

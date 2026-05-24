@@ -9,6 +9,7 @@ package main
 import (
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/cli"
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/domain"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/app"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/vars"
 )
@@ -33,14 +34,14 @@ func initializeApp() (IApp, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	domainService, cleanup4, err := domainapp.ProvideDomain(service, dirsService, varsService)
+	appService, cleanup4, err := app.ProvideAppService()
 	if err != nil {
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	iApp, cleanup5, err := newApp(domainService)
+	domainService, cleanup5, err := domainapp.ProvideDomain(service, dirsService, varsService, appService)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -48,7 +49,17 @@ func initializeApp() (IApp, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	iApp, cleanup6, err := newApp(domainService)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	return iApp, func() {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
