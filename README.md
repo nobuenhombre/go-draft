@@ -2,7 +2,7 @@
 
 **Scaffolding CLI for Go projects.** Generates directory structures and Go application skeletons with Wire DI, Gin API, cron, and graceful shutdown.
 
-Version: **v0.2.0** • [AGENTS.md](AGENTS.md)
+Version: **v0.3.0** • [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -68,7 +68,7 @@ cd /path/to/your-go-project
 go-draft -make=service -appname=my-api
 ```
 
-Generates 33 files — a production-ready service skeleton:
+Generates 33 files — a production-ready service skeleton
 
 ```
 project-root/
@@ -102,6 +102,45 @@ project-root/
         └── version/
 ```
 
+### Generate database scaffolding
+
+```bash
+cd /path/to/your-go-project
+go-draft -make=db -dbname=my_db
+```
+
+Generates database scripts with xo code generation:
+
+```
+src/
+├── internal/pkg/db/my_db/           # Go package for future models
+└── scripts/xo/
+    ├── xo.sh                        # shared utilities (7 files, once)
+    ├── yaml.sh
+    ├── postgresql.sh
+    ├── backup.sh
+    ├── restore.sh
+    ├── create.sh
+    ├── lint.sh
+    └── my_db/
+        ├── Makefile
+        ├── xo.yaml
+        ├── migrate-up.sh
+        ├── migrate-down.sh
+        ├── migrate-new.sh
+        ├── backups/local/
+        ├── backups/production/
+        ├── migrations/
+        ├── sql/query/many/
+        ├── sql/query/one/
+        ├── sql/query/uid/
+        ├── sql/query/routines/
+        ├── sql/query/views/
+        └── sql/templates/           # 11 xo Go templates
+```
+
+Backup databases — only `{dbname}/` is added, shared scripts preserved.
+
 ### Check version
 
 ```bash
@@ -117,15 +156,17 @@ go-draft --version
 go-draft -make=dirs          # YAML-based directory template
 go-draft -make=cli           # CLI application skeleton
 go-draft -make=service       # Service with API + cron
+go-draft -make=db            # Database scaffolding with xo scripts
 ```
 
 ## Flags
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-make` | `dirs` | Command: `dirs`, `cli`, `service` |
+| `-make` | `dirs` | Command: `dirs`, `cli`, `service`, `db` |
 | `-dirs` | `classic` | YAML template name: `classic`, `ddd` |
 | `-appname` | `""` | Application name for `cli` / `service` |
+| `-dbname` | `""` | Database name for `db` |
 | `-vars` | `""` | Variables `key1:val1,key2:val2` for `dirs` |
 | `-version` | — | Show version and exit |
 

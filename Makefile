@@ -1,3 +1,6 @@
+export GOPROXY := https://proxy.golang.org,direct
+export GOSUMDB := off
+
 include configs/_make_/config/project.mk
 include configs/_make_/config/go-build.mk
 include configs/_make_/lib/go-build/cache-ram-drive.mk

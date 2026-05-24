@@ -1,0 +1,18 @@
+name: db-directories
+description: Database scaffolding directory structure
+variables:
+    - DbName
+directories:
+    - path: src/internal/pkg/db/${DbName}
+      with_git_keep: true
+    - path: src/scripts/xo/${DbName}/backups
+    - path: src/scripts/xo/${DbName}/backups/local
+    - path: src/scripts/xo/${DbName}/backups/production
+    - path: src/scripts/xo/${DbName}/migrations
+    - path: src/scripts/xo/${DbName}/sql
+    - path: src/scripts/xo/${DbName}/sql/query
+    - path: src/scripts/xo/${DbName}/sql/query/many
+    - path: src/scripts/xo/${DbName}/sql/query/one
+    - path: src/scripts/xo/${DbName}/sql/query/uid
+    - path: src/scripts/xo/${DbName}/sql/query/routines
+    - path: src/scripts/xo/${DbName}/sql/query/views

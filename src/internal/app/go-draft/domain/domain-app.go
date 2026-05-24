@@ -89,7 +89,7 @@ func (d *AppDomain) MakeDirs() error {
 		return ge.Pin(err)
 	}
 
-	err = d.Dirs.CreateDirs(name, vars)
+	err = d.Dirs.CreateDirs("dirs/", name, vars)
 	if err != nil {
 		return ge.Pin(err)
 	}

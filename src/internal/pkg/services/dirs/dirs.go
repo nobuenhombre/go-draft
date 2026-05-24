@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/locator"
 	configdirs "github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs/config"
-	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/locator"
 	"github.com/nobuenhombre/suikat/pkg/ge"
 )
 
@@ -17,7 +17,7 @@ var (
 )
 
 type Service interface {
-	CreateDirs(name string, vars map[string]string) error
+	CreateDirs(root string, name string, vars map[string]string) error
 }
 
 type Provider struct {
@@ -27,8 +27,8 @@ func New() Service {
 	return &Provider{}
 }
 
-func (p *Provider) CreateDirs(name string, vars map[string]string) error {
-	path, err := locator.FindTemplateDir("dirs/" + name)
+func (p *Provider) CreateDirs(root string, name string, vars map[string]string) error {
+	path, err := locator.FindTemplateDir(root + name)
 	if err != nil {
 		return ge.Pin(err)
 	}

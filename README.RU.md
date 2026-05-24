@@ -2,7 +2,7 @@
 
 **Скаффолдинг CLI для Go-проектов.** Генерирует структуру директорий и каркасы Go-приложений с Wire DI, Gin API, cron и graceful shutdown.
 
-Версия: **v0.2.0** • [AGENTS.md](AGENTS.md)
+Версия: **v0.3.0** • [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -39,27 +39,7 @@ cd /path/to/your-go-project
 go-draft -make=cli -appname=my-tool
 ```
 
-Создаёт 21 файл — каркас консольного приложения:
-
-```
-project-root/
-├── Makefile                          # deps, wire команды
-├── configs/_make_/                   # Переменные сборки Go
-│   ├── config/project.mk
-│   ├── config/go-build.mk           # CGO_ENABLED=0, ldflags
-│   └── lib/go-build/                # RAM-кэш, прогресс-бар
-└── src/
-├── cmd/my-tool/
-│   ├── main.go       # точка входа (panic recovery, -version)
-│   ├── app.go        # IApp + App + newApp
-│   └── wire.go       # Wire injector
-└── internal/app/my-tool/
-    ├── cli/          # CLI-флаги + Wire provider
-    ├── config/       # YAML config (fico + yaml.v3) + тесты
-    ├── domain/       # Бизнес-логика (stub)
-    ├── log/          # LogFile (Open/Close/Get)
-    └── version/      # const Version
-```
+21 файл — каркас консольного приложения с Makefile, configs/_make_/ и деплой-скриптами.
 
 ### Сгенерировать системный сервис
 
@@ -68,45 +48,48 @@ cd /path/to/your-go-project
 go-draft -make=service -appname=my-api
 ```
 
-Создаёт 33 файла — полный production-ready сервис:
+37 файлов — Gin HTTP + graceful shutdown, cron, systemd unit-файлы.
+
+### Сгенерировать скрипты базы данных
+
+```bash
+cd /path/to/your-go-project
+go-draft -make=db -dbname=my_db
+```
+
+Создаёт scaffolding для PostgreSQL БД с xo-кодогенерацией:
 
 ```
-project-root/
-├── Makefile                          # deps, wire команды
-├── configs/_make_/                   # Переменные сборки Go
-│   ├── config/project.mk
-│   ├── config/go-build.mk           # CGO_ENABLED=0, ldflags
-│   └── lib/go-build/                # RAM-кэш, прогресс-бар
-└── src/
-    ├── cmd/my-api/
-    │   ├── main.go                   # + -version до Wire
-    │   ├── app.go                    # cronJob.Start(), httpServer.Run()
-    │   └── wire.go                   # 6 ProviderSet
-    └── internal/app/my-api/
-        ├── api/server/               # Gin HTTP + graceful shutdown
-        │   ├── server.go
-        │   ├── server.graceful.shutdown.go
-        │   ├── provider.go
-        │   ├── config/
-        │   └── router/
-        │       ├── router.go
-        │       ├── handlers/
-        │       └── middlewares/
-        ├── cli/                      # -runtype=init/service
-        ├── config/                   # hosts + cron секции
-        ├── cron-job/
-        │   ├── config/
-        │   └── jobs/example/         # cron.Job + Wire provider
-        ├── domain/                   # + GetConfig()
-        ├── log/
-        └── version/
+src/
+├── internal/pkg/db/my_db/           # Go-пакет для будущих моделей
+└── scripts/xo/
+    ├── xo.sh                        # общие утилиты (7 файлов, один раз)
+    ├── yaml.sh
+    ├── postgresql.sh
+    ├── backup.sh
+    ├── restore.sh
+    ├── create.sh
+    ├── lint.sh
+    └── my_db/
+        ├── Makefile                 # gen, backup, restore, lint, create
+        ├── xo.yaml
+        ├── migrate-up.sh
+        ├── migrate-down.sh
+        ├── migrate-new.sh
+        ├── backups/local/
+        ├── backups/production/
+        ├── migrations/
+        ├── sql/query/{many,one,uid,routines,views}/
+        └── sql/templates/           # 11 xo-шаблонов Go-генерации
 ```
+
+Для второй и последующих БД — только содержимое `my_db/`, общие скрипты не перезаписываются.
 
 ### Проверка версии
 
 ```bash
 go-draft --version
-# v0.2.0
+# v0.3.0
 ```
 
 ---
@@ -117,15 +100,17 @@ go-draft --version
 go-draft -make=dirs          # YAML-шаблон директорий
 go-draft -make=cli           # консольное приложение
 go-draft -make=service       # сервис с API + cron
+go-draft -make=db            # скрипты базы данных
 ```
 
 ## Флаги
 
 | Флаг | По умолчанию | Описание |
 |------|-------------|----------|
-| `-make` | `dirs` | Команда: `dirs`, `cli`, `service` |
+| `-make` | `dirs` | Команда: `dirs`, `cli`, `service`, `db` |
 | `-dirs` | `classic` | Имя YAML-шаблона: `classic`, `ddd` |
 | `-appname` | `""` | Имя приложения для `cli` / `service` |
+| `-dbname` | `""` | Имя базы данных для `-make=db` |
 | `-vars` | `""` | Переменные `key1:val1,key2:val2` для `dirs` |
 | `-version` | — | Показать версию и выйти |
 
@@ -142,14 +127,15 @@ go-draft/
 │       └── pkg/services/
 │           ├── dirs/           # Создание директорий по YAML
 │           ├── vars/           # Парсинг key:value
-│           └── app/            # Генерация Go из text/template
+│           ├── app/            # Генерация Go из text/template
+│           ├── locator/        # Поиск директорий шаблонов
+│           └── db/             # Генерация bash-скриптов БД
 ├── templates/
-│   ├── dirs/classic/           # YAML-шаблон классической структуры
-│   ├── dirs/ddd/               # YAML-шаблон DDD структуры
-│   └── app/
-│       ├── cli/                # Go-шаблоны консольного приложения
-│       └── service/            # Go-шаблоны сервиса
+│   ├── dirs/                   # YAML-шаблоны
+│   ├── app/                    # Go-шаблоны приложений
+│   └── db/                     # Bash-шаблоны БД
 ├── configs/_make_/             # Переменные для сборки
+├── sandbox/                    # Песочница acceptance-тестов
 └── service/deployments/        # Makefile для деплоя
 ```
 
@@ -180,10 +166,10 @@ go vet ./...       # Проверить код
 
 ### Добавление нового шаблона
 
-1. Создать `.tpl` файл в `templates/app/{cli|service}/`
-2. Если файл должен быть в корне проекта — положить в `_root_/`
-3. Использовать `{{.AppName}}` и `{{.ModulePath}}` для подстановки
-4. После генерации — `go/format` применяется автоматически
+1. Создать `.tpl` файл в `templates/app/{cli|service}/` или `templates/db/`
+2. Для корневых файлов — положить в `_root_/`
+3. Использовать `{{.AppName}}`, `{{.DbName}}`, `{{.ModulePath}}`
+4. Go-файлы форматируются автоматически; `.sh` — `0755`; xo-шаблоны (в `sql/templates/`) копируются без обработки
 
 ---
 

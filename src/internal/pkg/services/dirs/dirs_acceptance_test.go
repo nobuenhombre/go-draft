@@ -60,7 +60,7 @@ func TestAcceptance_CreateDirs_Classic(t *testing.T) {
 	projectDir := setupDirTest(t)
 
 	svc := dirs.New()
-	err := svc.CreateDirs("classic", map[string]string{"PROJECT_NAME": "hello-app"})
+	err := svc.CreateDirs("dirs/", "classic", map[string]string{"PROJECT_NAME": "hello-app"})
 	require.NoError(t, err)
 
 	// Verify root-level dirs exist
@@ -114,7 +114,7 @@ func TestAcceptance_CreateDirs_DDD(t *testing.T) {
 	projectDir := setupDirTest(t)
 
 	svc := dirs.New()
-	err := svc.CreateDirs("ddd", map[string]string{"PROJECT_NAME": "ddd-app"})
+	err := svc.CreateDirs("dirs/", "ddd", map[string]string{"PROJECT_NAME": "ddd-app"})
 	require.NoError(t, err)
 
 	// Verify DDD-specific layers
@@ -154,7 +154,7 @@ func TestAcceptance_CreateDirs_Error_MissingVar(t *testing.T) {
 
 	svc := dirs.New()
 	// classic requires PROJECT_NAME but we don't provide it
-	err := svc.CreateDirs("classic", map[string]string{})
+	err := svc.CreateDirs("dirs/", "classic", map[string]string{})
 	require.Error(t, err)
 	require.ErrorIs(t, err, dirs.ErrorMissingTemplateVar)
 }
@@ -163,7 +163,7 @@ func TestAcceptance_CreateDirs_Error_NotFound(t *testing.T) {
 	setupDirTest(t)
 
 	svc := dirs.New()
-	err := svc.CreateDirs("nonexistent-template", map[string]string{})
+	err := svc.CreateDirs("dirs/", "nonexistent-template", map[string]string{})
 	require.Error(t, err)
 }
 
@@ -192,7 +192,7 @@ directories:
 	require.NoError(t, err)
 
 	svc := dirs.New()
-	err = svc.CreateDirs("custom", map[string]string{"APP": "myapp"})
+	err = svc.CreateDirs("dirs/", "custom", map[string]string{"APP": "myapp"})
 	require.NoError(t, err)
 
 	// Verify the custom dir exists and has correct permissions
@@ -239,7 +239,7 @@ directories:
 	require.NoError(t, err)
 
 	svc := dirs.New()
-	err = svc.CreateDirs("multi", map[string]string{"APP": "web", "ENV": "production"})
+	err = svc.CreateDirs("dirs/", "multi", map[string]string{"APP": "web", "ENV": "production"})
 	require.NoError(t, err)
 
 	require.DirExists(t, filepath.Join(projectDir, "deploy/production/web"))
@@ -255,7 +255,7 @@ func TestAcceptance_CreateDirs_AlreadyExists(t *testing.T) {
 
 	// Running CreateDirs again should succeed (MkdirAll is idempotent)
 	svc := dirs.New()
-	err = svc.CreateDirs("classic", map[string]string{"PROJECT_NAME": "hello-app"})
+	err = svc.CreateDirs("dirs/", "classic", map[string]string{"PROJECT_NAME": "hello-app"})
 	require.NoError(t, err)
 
 	require.DirExists(t, filepath.Join(projectDir, "bin"))

@@ -42,7 +42,7 @@ func initializeApp() (IApp, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	dbService, cleanup5, err := db.ProvideDbService()
+	dbService, cleanup5, err := db.ProvideDbService(dirsService)
 	if err != nil {
 		cleanup4()
 		cleanup3()

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/db"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -60,7 +61,7 @@ func setupProject(t *testing.T) string {
 func TestAcceptance_CreateDb_AllFiles(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 	err := svc.CreateDb("orders_db")
 	require.NoError(t, err)
 
@@ -90,10 +91,69 @@ func TestAcceptance_CreateDb_AllFiles(t *testing.T) {
 	}
 }
 
+func TestAcceptance_CreateDb_Directories(t *testing.T) {
+	projectDir := setupProject(t)
+
+	svc := db.New(dirs.New())
+	err := svc.CreateDb("dirs_db")
+	require.NoError(t, err)
+
+	// pkg directory
+	require.DirExists(t, filepath.Join(projectDir, "src/internal/pkg/db/dirs_db"))
+	require.FileExists(t, filepath.Join(projectDir, "src/internal/pkg/db/dirs_db/.gitkeep"))
+
+	// xo subdirectories
+	dirs := []string{
+		"src/scripts/xo/dirs_db",
+		"src/scripts/xo/dirs_db/backups",
+		"src/scripts/xo/dirs_db/backups/local",
+		"src/scripts/xo/dirs_db/backups/production",
+		"src/scripts/xo/dirs_db/migrations",
+		"src/scripts/xo/dirs_db/sql",
+		"src/scripts/xo/dirs_db/sql/query",
+		"src/scripts/xo/dirs_db/sql/query/many",
+		"src/scripts/xo/dirs_db/sql/query/one",
+		"src/scripts/xo/dirs_db/sql/query/uid",
+		"src/scripts/xo/dirs_db/sql/query/routines",
+		"src/scripts/xo/dirs_db/sql/query/views",
+		"src/scripts/xo/dirs_db/sql/templates",
+	}
+	for _, d := range dirs {
+		require.DirExists(t, filepath.Join(projectDir, d), "dir %s should exist", d)
+	}
+}
+
+func TestAcceptance_CreateDb_XoTemplates(t *testing.T) {
+	projectDir := setupProject(t)
+
+	svc := db.New(dirs.New())
+	err := svc.CreateDb("xo_app")
+	require.NoError(t, err)
+
+	// All 11 xo template files should be copied verbatim
+	templates := []string{
+		"postgres.enum.go", "postgres.foreignkey.go", "postgres.index.go",
+		"postgres.proc.go", "postgres.query.go", "postgres.querytype.go",
+		"postgres.type.go", "xo_db.go", "xo_package.go",
+		"xouid_package.go", "xouid_query.go",
+	}
+	for _, f := range templates {
+		path := filepath.Join(projectDir, "src/scripts/xo/xo_app/sql/templates", f)
+		require.FileExists(t, path, "xo template %s should exist", f)
+	}
+
+	// Verify they contain xo template syntax (not processed by Go text/template)
+	// xo templates use {{.}} syntax which would fail if processed by Go's text/template
+	sample := filepath.Join(projectDir, "src/scripts/xo/xo_app/sql/templates/xo_package.go")
+	content, err := os.ReadFile(sample)
+	require.NoError(t, err)
+	require.Contains(t, string(content), "{{ .Package }}")
+}
+
 func TestAcceptance_CreateDb_XoYamlContent(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 	err := svc.CreateDb("analytics")
 	require.NoError(t, err)
 
@@ -110,7 +170,7 @@ func TestAcceptance_CreateDb_XoYamlContent(t *testing.T) {
 func TestAcceptance_CreateDb_MakefileContent(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 	err := svc.CreateDb("users")
 	require.NoError(t, err)
 
@@ -129,7 +189,7 @@ func TestAcceptance_CreateDb_MakefileContent(t *testing.T) {
 func TestAcceptance_CreateDb_SecondDbKeepsShared(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 
 	// First DB
 	err := svc.CreateDb("first")
@@ -151,7 +211,7 @@ func TestAcceptance_CreateDb_SecondDbKeepsShared(t *testing.T) {
 func TestAcceptance_CreateDb_Error_NoTemplates(t *testing.T) {
 	setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 	// There's no templates/db/ in the test — wait, there IS. Let's test
 	// that an empty/whitespace db name still works (no validation in db service)
 	err := svc.CreateDb("valid")
@@ -161,7 +221,7 @@ func TestAcceptance_CreateDb_Error_NoTemplates(t *testing.T) {
 func TestAcceptance_CreateDb_MigrateScripts(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 	err := svc.CreateDb("inventory")
 	require.NoError(t, err)
 
@@ -191,7 +251,7 @@ func TestAcceptance_CreateDb_MigrateScripts(t *testing.T) {
 func TestAcceptance_CreateDb_FilePermissions(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 	err := svc.CreateDb("payments")
 	require.NoError(t, err)
 
@@ -213,7 +273,7 @@ func TestAcceptance_CreateDb_FilePermissions(t *testing.T) {
 func TestAcceptance_CreateDb_SharedScriptNotOverwritten(t *testing.T) {
 	projectDir := setupProject(t)
 
-	svc := db.New()
+	svc := db.New(dirs.New())
 
 	// First DB creates xo.sh
 	err := svc.CreateDb("db1")

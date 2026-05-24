@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/google/wire"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 )
 
 // ProviderSet exports Wire providers for the db package.
@@ -12,12 +13,12 @@ var ProviderSet = wire.NewSet(
 )
 
 // ProvideDbService creates the database scaffolding service.
-func ProvideDbService() (Service, func(), error) {
+func ProvideDbService(dirsService dirs.Service) (Service, func(), error) {
 	cleanup := func() {
 		log.Println("Db Service cleanup")
 	}
 
-	dbService := New()
+	dbService := New(dirsService)
 
 	return dbService, cleanup, nil
 }

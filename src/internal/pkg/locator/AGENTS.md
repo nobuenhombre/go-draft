@@ -27,7 +27,7 @@ func FindTemplateDir(subpath string) (string, error)
 ## Использование
 
 ```go
-import "github.com/nobuenhombre/go-draft/src/internal/pkg/services/locator"
+import "github.com/nobuenhombre/go-draft/src/internal/pkg/locator"
 
 // Поиск YAML-шаблона директорий
 dir, err := locator.FindTemplateDir("dirs/classic")

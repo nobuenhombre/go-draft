@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/locator"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/locator"
 	"github.com/nobuenhombre/suikat/pkg/ge"
 )
 
