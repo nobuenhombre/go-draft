@@ -1,7 +1,7 @@
-include ../../configs/_make_/config/project.mk
-include ../../configs/_make_/config/go-build.mk
-include ../../configs/_make_/lib/go-build/cache-ram-drive.mk
-include ../../configs/_make_/lib/go-build/progress-bar.mk
+include ../../../../configs/_make_/config/project.mk
+include ../../../../configs/_make_/config/go-build.mk
+include ../../../../configs/_make_/lib/go-build/cache-ram-drive.mk
+include ../../../../configs/_make_/lib/go-build/progress-bar.mk
 
 #======================================================
 # {{.AppName}}
@@ -9,7 +9,7 @@ include ../../configs/_make_/lib/go-build/progress-bar.mk
 APP_NAME={{.AppName}}
 APP_LOG_NAME={{.AppName}}
 
-PROJECT_ROOT_PATH=../../..
+PROJECT_ROOT_PATH=../../../..
 INSTALL_PATH=/usr/local/bin
 
 BUILD_PLATFORM=linux
