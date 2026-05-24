@@ -1,11 +1,11 @@
-include .env
-export $(shell sed 's/=.*//' .env)
+include ../../../../configs/_make_/config/project.mk
+include ../../../../configs/_make_/config/go-build.mk
+include ../../../../configs/_make_/lib/go-build/cache-ram-drive.mk
+include ../../../../configs/_make_/lib/go-build/progress-bar.mk
 
 #======================================================
 # HTTP Server
 #======================================================
-PROJECT=go-draft
-APP_VERSION=v0.0.1
 APP_NAME=go-draft
 
 PROJECT_ROOT_PATH=../../../..
@@ -16,6 +16,19 @@ BIN_PATH=bin/$(APP_NAME)/linux
 
 APP_BINARY=$(BIN_PATH)/$(APP_NAME)
 APP_INSTALL=$(INSTALL_PATH)/$(APP_NAME)
+
+define GoBuildApp
+	cd $(PROJECT_ROOT_PATH)/ && \
+	go mod tidy && \
+	$(GO_CACHE_ENV) \
+	$(GO_TMPDIR_ENV) \
+	GO111MODULE=on CGO_ENABLED=1 \
+	CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+	GOOS=$(BUILD_PLATFORM) GOARCH=amd64 \
+	go build $(1) -x -ldflags="-s -w" -a -installsuffix nocgo \
+	-o "$(APP_BINARY)" \
+	./src/cmd/$(APP_NAME) 2>&1
+endef
 
 #=========================================================================
 #
@@ -33,8 +46,17 @@ all: uninstall-app build-app install-app
 build-app:
 	cd $(PROJECT_ROOT_PATH)/ && \
 	go mod tidy && \
-	CGO_ENABLED=0 GOOS=$(BUILD_PLATFORM) GOARCH=amd64 go build -ldflags="-s -w" -o $(APP_BINARY) -v src/cmd/$(APP_NAME)/main.go && \
-	chmod +x $(APP_BINARY);
+	CGO_ENABLED=0 GOOS=$(BUILD_PLATFORM) GOARCH=amd64 go build -ldflags="-s -w" -o $(APP_BINARY) -v ./src/cmd/$(APP_NAME) && \
+	chmod +x $(APP_BINARY) && \
+	ls -lh $(APP_BINARY) && \
+    $(APP_BINARY) --version;
+
+## build-app-progress: Скомпилировать (sudo apt install gawk)
+build-app-progress:
+	$(call GoBuildProgress,GoBuildApp,$(APP_BINARY_NAME)) && \
+    chmod +x $(APP_BINARY) && \
+	ls -lh $(APP_BINARY) && \
+	$(APP_BINARY) --version;
 
 ## install-app: Установить приложение
 install-app:
