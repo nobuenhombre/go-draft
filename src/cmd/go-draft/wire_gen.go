@@ -10,6 +10,7 @@ import (
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/cli"
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/domain"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/app"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/db"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/vars"
 )
@@ -41,7 +42,7 @@ func initializeApp() (IApp, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	domainService, cleanup5, err := domainapp.ProvideDomain(service, dirsService, varsService, appService)
+	dbService, cleanup5, err := db.ProvideDbService()
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -49,7 +50,7 @@ func initializeApp() (IApp, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	iApp, cleanup6, err := newApp(domainService)
+	domainService, cleanup6, err := domainapp.ProvideDomain(service, dirsService, varsService, appService, dbService)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -58,7 +59,18 @@ func initializeApp() (IApp, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	iApp, cleanup7, err := newApp(domainService)
+	if err != nil {
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	return iApp, func() {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()

@@ -40,7 +40,9 @@ AppDomain.Run()
   │       └── app.CreateApp(appName, "service")
   │           ├── templates/app/service/ → 27 файлов в src/
   │           └── _root_/ → Makefile + configs/_make_/ в корне
-  └── return error
+  └── "db" → MakeDb()
+      └── db.CreateDb(dbName)
+          └── templates/db/ → 7 общих скриптов + 5 для БД в src/scripts/xo/
 ```
 
 ## Константы
@@ -50,6 +52,7 @@ AppDomain.Run()
 | `MakeDirs` | `"dirs"` | Создание директорий по YAML-шаблону |
 | `MakeCli` | `"cli"` | Генерация консольного приложения |
 | `MakeService` | `"service"` | Генерация сервиса с API и cron |
+| `MakeDb` | `"db"` | Генерация bash-скриптов базы данных |
 
 ## Ошибки
 
@@ -59,6 +62,7 @@ AppDomain.Run()
 | `ErrorUnknownMakeCommand` | Неизвестное значение `-make` |
 | `ErrorEmptyDirsTemplateName` | Флаг `-dirs` пустой при `-make=dirs` |
 | `ErrorEmptyAppName` | Флаг `-appname` пустой при `-make=cli` или `-make=service` |
+| `ErrorEmptyDbName` | Флаг `-dbname` пустой при `-make=db` |
 
 ## Требования к шаблонам
 

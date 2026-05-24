@@ -6,6 +6,7 @@ import (
 
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/cli"
 	appsvc "github.com/nobuenhombre/go-draft/src/internal/pkg/services/app"
+	dbsvc "github.com/nobuenhombre/go-draft/src/internal/pkg/services/db"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/vars"
 	"github.com/nobuenhombre/suikat/pkg/ge"
@@ -16,12 +17,14 @@ var (
 	ErrorUnknownMakeCommand    = errors.New("unknown make command")
 	ErrorEmptyDirsTemplateName = errors.New("empty dirs template name")
 	ErrorEmptyAppName          = errors.New("empty app name")
+	ErrorEmptyDbName           = errors.New("empty db name")
 )
 
 const (
 	MakeDirs    = "dirs"
 	MakeCli     = "cli"
 	MakeService = "service"
+	MakeDb      = "db"
 )
 
 type DomainService interface {
@@ -33,14 +36,16 @@ type AppDomain struct {
 	Dirs dirs.Service
 	Vars vars.Service
 	App  appsvc.Service
+	Db   dbsvc.Service
 }
 
-func New(cliConfig cli.Service, dirsService dirs.Service, varsService vars.Service, appService appsvc.Service) DomainService {
+func New(cliConfig cli.Service, dirsService dirs.Service, varsService vars.Service, appService appsvc.Service, dbService dbsvc.Service) DomainService {
 	return &AppDomain{
 		Cli:  cliConfig.(*cli.Config),
 		Dirs: dirsService,
 		Vars: varsService,
 		App:  appService,
+		Db:   dbService,
 	}
 }
 
@@ -58,6 +63,11 @@ func (d *AppDomain) Run() error {
 		}
 	case MakeCli, MakeService:
 		err := d.MakeApp(makeCmd)
+		if err != nil {
+			return ge.Pin(err)
+		}
+	case MakeDb:
+		err := d.MakeDb()
 		if err != nil {
 			return ge.Pin(err)
 		}
@@ -94,6 +104,20 @@ func (d *AppDomain) MakeApp(appType string) error {
 	}
 
 	err := d.App.CreateApp(appName, appType)
+	if err != nil {
+		return ge.Pin(err)
+	}
+
+	return nil
+}
+
+func (d *AppDomain) MakeDb() error {
+	dbName := strings.TrimSpace(d.Cli.DbName)
+	if len(dbName) == 0 {
+		return ge.Pin(ErrorEmptyDbName)
+	}
+
+	err := d.Db.CreateDb(dbName)
 	if err != nil {
 		return ge.Pin(err)
 	}

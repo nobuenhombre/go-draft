@@ -17,8 +17,15 @@ services/
 │   ├── vars.go     # Service + Provider + New() + Parse()
 │   └── provider.go # Wire-провайдер
 │
-└── app/            # Генерация Go-каркасов (см. app/AGENTS.md)
-    ├── app.go      # Service + Provider + New() + CreateApp()
+├── app/            # Генерация Go-каркасов (см. app/AGENTS.md)
+│   ├── app.go      # Service + Provider + New() + CreateApp()
+│   └── provider.go # Wire-провайдер
+│
+├── locator/        # Поиск директорий шаблонов (см. locator/AGENTS.md)
+│   └── locator.go  # FindTemplateDir()
+│
+└── db/             # Генерация bash-скриптов БД (см. db/AGENTS.md)
+    ├── db.go       # Service + Provider + New() + CreateDb()
     └── provider.go # Wire-провайдер
 ```
 

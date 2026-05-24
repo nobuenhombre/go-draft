@@ -25,7 +25,24 @@ templates/
     └── service/              # Системный сервис (37 .tpl файлов)
         ├── _root_/                      # Makefile + configs/_make_/ + configs/{env}/*.service + service/deployments/
         ├── cmd/{{.AppName}}/            # main.go, app.go (+ cron, API), wire.go
-        └── internal/app/{{.AppName}}/   # api/server, cli, config, cron-job, domain, log, version
+        ├── internal/app/{{.AppName}}/   # api/server, cli, config, cron-job, domain, log, version
+        └── scripts/                     # AGENTS.md (справочно)
+
+templates/db/                  # Bash-шаблоны для -make=db
+└── scripts/xo/                # xo-утилиты и скрипты миграций
+    ├── xo.sh.tpl             # Генерация Go-кода
+    ├── yaml.sh.tpl           # Парсер YAML
+    ├── postgresql.sh.tpl     # Строки подключения
+    ├── backup.sh.tpl         # pg_dump
+    ├── restore.sh.tpl        # psql restore
+    ├── create.sh.tpl         # CREATE USER/DATABASE
+    ├── lint.sh.tpl           # gofmt + golint
+    └── {{.DbName}}/           # 5 файлов для каждой БД
+        ├── Makefile.tpl
+        ├── xo.yaml.tpl
+        ├── migrate-up.sh.tpl
+        ├── migrate-down.sh.tpl
+        └── migrate-new.sh.tpl
 ```
 
 ## Шаблоны dirs/

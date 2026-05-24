@@ -26,17 +26,19 @@ go-draft/
 │   ├── cmd/go-draft/                # Точка входа + Wire DI (см. cmd/go-draft/AGENTS.md)
 │   └── internal/                    # Внутренние пакеты (см. internal/AGENTS.md)
 │       ├── app/go-draft/            # Слой приложения (cli, domain, version, config)
-│       └── pkg/services/            # Переиспользуемые сервисы (dirs, vars, app, locator)
+│       └── pkg/services/            # Переиспользуемые сервисы (dirs, vars, app, locator, db)
 │
 ├── sandbox/                         # Песочница для acceptance-тестов (см. sandbox/AGENTS.md)
 │
-└── templates/                       # Шаблоны для генерации (см. templates/AGENTS.md)
-    ├── dirs/                        # YAML-шаблоны структур директорий
-    │   ├── classic/
-    │   └── ddd/
-    └── app/                         # Go-шаблоны каркасов приложений
-        ├── cli/                     # 22 файла — консольное приложение
-        └── service/                 # 37 файлов (+ API server, cron-job, корневой Makefile, deployment Makefile, systemd units)
+├── templates/                       # Шаблоны для генерации (см. templates/AGENTS.md)
+│   ├── dirs/                        # YAML-шаблоны структур директорий
+│   │   ├── classic/
+│   │   └── ddd/
+│   ├── app/                         # Go-шаблоны каркасов приложений
+│   │   ├── cli/                     # 22 файла — консольное приложение
+│   │   └── service/                 # 37 файлов (+ API server, cron-job, корневой Makefile, deployment Makefile, systemd units)
+│   └── db/                          # Bash-шаблоны скриптов базы данных
+│       └── scripts/xo/              # 7 общих скриптов + 5 для каждой БД
 ```
 
 ## Технологический стек
@@ -62,9 +64,10 @@ go-draft/
 
 | Флаг | По умолчанию | Описание |
 |------|-------------|----------|
-| `-make` | `dirs` | Команда: `dirs` / `cli` / `service` |
+| `-make` | `dirs` | Команда: `dirs` / `cli` / `service` / `db` |
 | `-dirs` | `classic` | Имя YAML-шаблона структуры директорий |
 | `-appname` | `""` | Имя приложения для `-make=cli` или `-make=service` |
+| `-dbname` | `""` | Имя базы данных для `-make=db` |
 | `-vars` | `""` | Переменные `key1:val1,key2:val2` для `-make=dirs` |
 | `-version` | `false` | Показать версию и выйти |
 
@@ -77,8 +80,14 @@ go-draft -make=dirs -dirs=classic -vars="PROJECT_NAME:my-project"
 # Сгенерировать консольное приложение (15 Go-файлов)
 go-draft -make=cli -appname=my-tool
 
-# Сгенерировать сервис с API и cron (33 файла + Makefile + _make_)
+# Сгенерировать сервис с API и cron
 go-draft -make=service -appname=my-service
+
+# Сгенерировать скрипты базы данных (12 файлов)
+go-draft -make=db -dbname=my_db
+
+# Вторая БД — общие скрипты не перезаписываются
+go-draft -make=db -dbname=another_db
 ```
 
 ## Conventions

@@ -8,6 +8,7 @@ import (
 	"github.com/nobuenhombre/go-draft/src/internal/app/go-draft/cli"
 	domainapp "github.com/nobuenhombre/go-draft/src/internal/app/go-draft/domain"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/app"
+	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/db"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/dirs"
 	"github.com/nobuenhombre/go-draft/src/internal/pkg/services/vars"
 )
@@ -20,6 +21,7 @@ func initializeApp() (IApp, func(), error) {
 		dirs.ProviderSet,
 		vars.ProviderSet,
 		app.ProviderSet,
+		db.ProviderSet,
 		domainapp.ProviderSet,
 		newApp,
 	)

@@ -18,9 +18,10 @@
 
 | Флаг | Тип | По умолчанию | Описание |
 |------|-----|-------------|----------|
-| `-make` | string | `dirs` | Команда: `dirs` / `cli` / `service` |
+| `-make` | string | `dirs` | Команда: `dirs` / `cli` / `service` / `db` |
 | `-dirs` | string | `classic` | Имя шаблона структуры директорий |
 | `-appname` | string | `""` | Имя приложения для `-make=cli` или `-make=service` |
+| `-dbname` | string | `""` | Имя базы данных для `-make=db` |
 | `-vars` | string | `""` | Переменные `key1:val1,key2:val2` для `-make=dirs` |
 | `-version` | bool | `false` | Показать версию и выйти |
 
@@ -30,6 +31,7 @@
 - `MakeDirs = "dirs"` — создание структуры директорий по YAML-шаблону
 - `MakeCli = "cli"` — генерация каркаса консольного приложения
 - `MakeService = "service"` — генерация каркаса сервиса с API и cron
+- `MakeDb = "db"` — генерация bash-скриптов базы данных
 
 ## Wire-интеграция
 
