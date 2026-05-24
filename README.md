@@ -203,4 +203,4 @@ cd .. && rm -rf sandbox/src sandbox/templates sandbox/go.mod sandbox/go.sum sand
 
 ## License
 
-MIT
+Apache 2.0
