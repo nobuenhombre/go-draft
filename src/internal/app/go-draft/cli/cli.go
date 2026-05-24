@@ -15,7 +15,8 @@ type Config struct {
 	// Dirs specifies the directory structure template for configuration files.
 	Dirs string `cli:"dirs[Directory structure template]:string=classic"`
 	// Vars contains variables for substitution in the format key1:value1,key2:value2.
-	Vars string `cli:"vars[Variables for substitution in the format key1:value1,key2:value2]:string="`
+	Vars    string `cli:"vars[Variables for substitution in the format key1:value1,key2:value2]:string="`
+	Version bool   `cli:"version[Show version and exit]:bool=false"`
 }
 
 // New creates a new Config instance by loading values from command-line arguments.
