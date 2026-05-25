@@ -19,6 +19,7 @@ type Config struct {
 	RunType string `cli:"runtype[Run type (init/service)]:string=init"`
 	Config  string `cli:"config[Path to YAML config]:string=config.yaml"`
 	LogFile string `cli:"log[Path to log file]:string="`
+    Version bool   `cli:"version[Show version and exit]:bool=false"`
 }
 
 // New creates a new Config instance by loading values from command-line arguments.
