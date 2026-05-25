@@ -10,7 +10,7 @@ include configs/_make_/lib/go-build/progress-bar.mk
 # команды makefile -
 # если команда совпадет с названием каталога
 #===========================================
-.PHONY: help deps run build all lint test fmt wire
+.PHONY: help deps run build all lint test fmt wire share-templates
 
 help: Makefile
 	@echo "Выберите опцию сборки:"
@@ -27,3 +27,8 @@ deps:
 wire:
 	wire ./src/...
 	gofmt -w src/cmd/*/wire_gen.go
+
+## share-templates: Скопировать шаблоны в ~/.go-draft/templates/
+share-templates:
+	@mkdir -p $(HOME)/.go-draft/templates
+	rsync -av --delete templates/ $(HOME)/.go-draft/templates/
