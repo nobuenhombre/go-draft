@@ -1,10 +1,5 @@
-include ../../../../configs/_make_/config/project.mk
-include ../../../../configs/_make_/config/go-build.mk
-include ../../../../configs/_make_/lib/go-build/cache-ram-drive.mk
-include ../../../../configs/_make_/lib/go-build/progress-bar.mk
-
 #======================================================
-# HTTP Server
+# go-draft
 #======================================================
 APP_NAME=go-draft
 
@@ -51,10 +46,13 @@ build-app:
 	ls -lh $(APP_BINARY) && \
     $(APP_BINARY) --version;
 
-## build-app-progress: Скомпилировать (sudo apt install gawk)
+## build-app-progress: Скомпилировать с прогресс-баром
 build-app-progress:
-	$(call GoBuildProgress,GoBuildApp,$(APP_BINARY_NAME)) && \
-    chmod +x $(APP_BINARY) && \
+	cd $(PROJECT_ROOT_PATH)/ && \
+	CGO_ENABLED=0 GOOS=$(BUILD_PLATFORM) GOARCH=amd64 \
+	GOFLAGS="-ldflags=-s -w" \
+	gobp --full-rebuild -binary ./src/cmd/$(APP_NAME) -out $(APP_BINARY) && \
+	chmod +x $(APP_BINARY) && \
 	ls -lh $(APP_BINARY) && \
 	$(APP_BINARY) --version;
 

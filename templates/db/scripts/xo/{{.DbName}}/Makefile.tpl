@@ -8,7 +8,7 @@ CREATE=../create.sh
 # команды makefile -
 # если команда совпадет с названием каталога
 #===========================================
-.PHONY: help gen
+.PHONY: help gen backup backup-production restore lint create
 
 help: Makefile
 	@echo "Выберите опцию сборки:"

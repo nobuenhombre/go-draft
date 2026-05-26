@@ -1,16 +1,13 @@
+PROJECT_NAME="github.com/nobuenhombre/go-draft"
+
 export GOPROXY := https://proxy.golang.org,direct
 export GOSUMDB := off
-
-include configs/_make_/config/project.mk
-include configs/_make_/config/go-build.mk
-include configs/_make_/lib/go-build/cache-ram-drive.mk
-include configs/_make_/lib/go-build/progress-bar.mk
 
 #===========================================
 # команды makefile -
 # если команда совпадет с названием каталога
 #===========================================
-.PHONY: help deps run build all lint test fmt wire share-templates
+.PHONY: help deps wire share-templates
 
 help: Makefile
 	@echo "Выберите опцию сборки:"
