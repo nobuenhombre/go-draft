@@ -2,7 +2,7 @@
 
 **Скаффолдинг CLI для Go-проектов.** Генерирует структуру директорий и каркасы Go-приложений с Wire DI, Gin API, cron и graceful shutdown.
 
-Версия: **v0.3.0** • [AGENTS.md](AGENTS.md)
+Версия: **v0.5.0** • [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -89,7 +89,7 @@ src/
 
 ```bash
 go-draft --version
-# v0.3.0
+# v0.5.0
 ```
 
 ---

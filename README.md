@@ -2,7 +2,7 @@
 
 **Scaffolding CLI for Go projects.** Generates directory structures and Go application skeletons with Wire DI, Gin API, cron, and graceful shutdown.
 
-Version: **v0.3.0** • [AGENTS.md](AGENTS.md)
+Version: **v0.5.0** • [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -145,7 +145,7 @@ Backup databases — only `{dbname}/` is added, shared scripts preserved.
 
 ```bash
 go-draft --version
-# v0.2.0
+# v0.5.0
 ```
 
 ---
