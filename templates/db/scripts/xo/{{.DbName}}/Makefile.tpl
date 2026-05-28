@@ -1,4 +1,3 @@
-XO=../xo.sh
 LINT=../lint.sh
 BACKUP=../backup.sh
 RESTORE=../restore.sh
@@ -16,7 +15,7 @@ help: Makefile
 
 ## gen: сгенерировать код GO
 gen:
-	time $(XO) xo.yaml
+	goxogen -config "xo.yaml"
 
 ## backup: сделать бекап локальной базы
 backup:
